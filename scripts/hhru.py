@@ -142,7 +142,7 @@ def get_vacancies(title="Data Science"):
 
   data = pd.DataFrame(result)
   data.salary = parse_salary(data)
-  data.experience = parse_experience(data)
+  # data.experience = parse_experience(data)
   data.key_skills = parse_skills(data)
   data.key_skills = fix_skills(data)
   return data

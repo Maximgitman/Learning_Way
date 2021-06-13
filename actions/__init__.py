@@ -90,4 +90,21 @@ def third_step(id):
     db.close()
     data = pd.read_json(data['_vacancy_table'])
     courses, vacancies = get_courses(data, user)
+    print(courses)
+    courses = {
+        skill: [
+            {
+                'title': list(courses[skill]['title'].values())[i], 
+                'link': list(courses[skill]['link'].values())[i] 
+            }
+            for i in range(len(courses[skill]['title']))] for skill in courses
+    }
+    vacancies = [
+        {
+            'name': list(vacancies['name'].values())[i], 
+            'salary': list(vacancies['salary'].values())[i], 
+            'key_skills': list(vacancies['key_skills'].values())[i],
+        } 
+        for i in range(len(vacancies['name']))
+    ]
     return jsonify({'courses': courses, 'skills': list(courses.keys()), 'vacancies': vacancies})

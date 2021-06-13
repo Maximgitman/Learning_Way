@@ -58,12 +58,27 @@
         </div> 
         <div class="form-3 d-none flex-column" ref="form5">
             <p>Вот, что мы подобрали для Вас!</p>
-            <div class="card">
+            <div class="card m-2">
                 <div class="card-header">
-                    <p>Вакансии наиболее подходящие по Вашим навыкам</p>
+                    <p>Вакансии наиболее подходящие по Вашим навыкам (по данным hh.ru)</p>
                 </div>
                 <div v-for="vacancy in form5.vacancies" class="card-body">
-                    <p>{{ vacancy.title }}</p>
+                    <p>{{ vacancy.name }}</p>
+                    <p>Необходимые навыки:</p>
+                    <ol> 
+                        <li v-for="skill in vacancy.key_skills">{{ skill }}</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="card m-2">
+                <div class="card-header">
+                    <p>Курсы, которые помогут Вам улучшить Ваши навыки</p>
+                </div>
+                <div v-for="skill in form5.skills" class="card-body">
+                    <p>Для улучшения навыка {{ skill }}</p>
+                    <div v-for="course in form5.courses[skill]">
+                        <p><a v-bind:href="course.link">{{ course.title }}</a></p>
+                    </div>
                 </div>
             </div>
         </div> 
@@ -107,9 +122,9 @@
                     timerId: undefined
                 },
                 form5: {
-                    vacancies: [],
+                    vacancies: {name: []},
                     skills: [],
-                    courses: [],
+                    courses: {title: []},
                 }
             },
             methods: {
@@ -183,6 +198,13 @@
                     let response = await fetch('/third-step/' + this.query_id, {method: 'put', body: JSON.stringify(data)});
                     let json = await response.json();
                     console.log(json);
+                    this.form5.skills = json['skills']
+                    this.form5.vacancies = json['vacancies']
+                    this.form5.courses = json['courses']
+                    this.$refs.form4.classList.remove('d-flex')
+                    this.$refs.form4.classList.add('d-none');
+                    this.$refs.form5.classList.remove('d-none')
+                    this.$refs.form5.classList.add('d-flex');
                 },
                 changeDots2: async function() {
                     let element = document.getElementById('dots-2');
