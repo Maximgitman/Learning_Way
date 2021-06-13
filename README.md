@@ -22,7 +22,7 @@ https://colab.research.google.com/drive/1V54ori-qyT74uNEBdwYMRdfKIzYgexO8?usp=sh
 http://90.188.227.45:8000/
 
 Демонстрация работы web-приложения на gif.
-demo_medium.gif![demo_medium](https://user-images.githubusercontent.com/74874309/121821854-62d8a480-cca4-11eb-8aa3-8f8d6cc5a7fc.gif)
+![demo_medium](https://user-images.githubusercontent.com/74874309/121821854-62d8a480-cca4-11eb-8aa3-8f8d6cc5a7fc.gif)
 
 Текстовое описание работы:
 На главной странице вы увидите форму для заполнения 
