@@ -1,3 +1,5 @@
+{% raw %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,29 +10,204 @@
     <title>Welcome!</title>
 </head>
 <body class="d-flex justify-content-center p-5">
-
-    <!-- <div class="card">
-        <div class="card-header p-2">
-            <h2>Hello1</h2>
+    <div id="app">
+        <div class="form-1 d-flex flex-column align-items-center" ref="form1">
+            <div class="m-2"><input class="form-control" type="text" placeholder="Введите Ваше ФИО" v-model="form1.name"></div>
+            <div class="m-2"><input class="form-control" type="text" placeholder="Введите желаемую профессию" v-model="form1.profession"></div>
+            <div class="m-2"><button class="btn btn-success" @click="firstStep">Далее</button></div>
         </div>
-        <div class="card-body p-2">
-            <h2>Hello2</h2>
+        <div class="form-2 d-none" ref="form2">
+            <p>Проводим аналитику по Вашей вакансии<span id="dots-1"></span></p>
         </div>
-        <div class="card-header p-2">
-            <h2>Hello3</h2>
-        </div>
-        <div class="card-body p-2">
-            <h2>Hello4</h2>
-        </div>
-    </div> -->
-
-    <div class="form-1">
-        <div><input class="form-control" type="text" placeholder="Введите Ваше ФИО"></div>
-        <div><input class="form-control" type="text" placeholder="Введите желаемую провессию"></div>
+        <div class="form-3 d-none flex-column" ref="form3">
+            <p>Оцените свой уровень владения следующими навыками:</p>
+            <div class="container">
+                <div class="m-2 row skill-field" v-for="skill in form3.skills">
+                    <p class="col">{{ skill }}</p>
+                    <div class="form-check form-check-inline col">
+                        <div @click="changeLevel" class="skill-level">
+                            <input class="form-check-input" v-bind:name="skill" value="0" type="radio" checked>
+                            <label class="form-check-label">Не знаком</label>
+                        </div>
+                        <div @click="changeLevel" class="skill-level">
+                            <input class="form-check-input" v-bind:name="skill" value="1" type="radio">
+                            <label class="form-check-label">Немного знаю</label>
+                        </div>
+                        <div @click="changeLevel" class="skill-level">
+                            <input class="form-check-input" v-bind:name="skill" value="2" type="radio">
+                            <label class="form-check-label">Умею</label>
+                        </div>
+                        <div @click="changeLevel" class="skill-level">
+                            <input class="form-check-input" v-bind:name="skill" value="3" type="radio">
+                            <label class="form-check-label">Умею!</label>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                <div class="add-field">
+                    <p>Добавить еще один навык:</p>
+                    <select class="form-select" @change="addSkill">
+                        <option v-for="skill in form3.all_skills" v-bind:value="skill">{{ skill }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="m-2"><button class="btn btn-success" @click="secondStep">Далее</button></div>
+        </div> 
+        <div class="form-3 d-none flex-column" ref="form4">
+            <p>Какой интересный набор навыков. Дайте-ка нам подумать<span id="dots-2"></span></p>
+        </div> 
+        <div class="form-3 d-none flex-column" ref="form5">
+            <p>Вот, что мы подобрали для Вас!</p>
+            <div class="card">
+                <div class="card-header">
+                    <p>Вакансии наиболее подходящие по Вашим навыкам</p>
+                </div>
+                <div v-for="vacancy in form5.vacancies" class="card-body">
+                    <p>{{ vacancy.title }}</p>
+                </div>
+            </div>
+        </div> 
     </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <script>
+        Array.prototype.remove = function() {
+            var what, a = arguments, L = a.length, ax;
+            while (L && this.length) {
+                what = a[--L];
+                while ((ax = this.indexOf(what)) !== -1) {
+                    this.splice(ax, 1);
+                }
+            }
+            return this;
+        };
+
+
+        let app = new Vue({
+            el: '#app',
+            data: {
+                query_id: undefined,
+                form1: {
+                    name: undefined,
+                    profession: undefined,
+                },
+                form2: {
+                    timerId: undefined,
+                },
+                form3: {
+                    skills: [],
+                    all_skills: [],
+                    levels: {},
+                },
+                form4: {
+                    timerId: undefined
+                },
+                form5: {
+                    vacancies: [],
+                    skills: [],
+                    courses: [],
+                }
+            },
+            methods: {
+                firstStep: async function(event) {
+                    event.preventDefault();
+                    let data = new FormData();
+                    data.append('name', this.form1.name);
+                    data.append('profession', this.form1.profession);
+                    let response = await fetch('/first-step', {method: 'post', body: data});
+                    let json = await response.json() 
+                    localStorage.setItem('query_id', json['query_id']);
+                    this.query_id = json['query_id'];
+                    this.$refs.form1.classList.remove('d-flex')
+                    this.$refs.form1.classList.add('d-none');
+                    this.$refs.form2.classList.remove('d-none')
+                    this.$refs.form2.classList.add('d-flex');
+                    this.form2.timerId = setInterval(this.changeDots1, 1000);
+                },
+                changeDots1: async function() {
+                    let element = document.getElementById('dots-1');
+                    let text = element.innerText;
+                    if (text.length == 0) {
+                        text = '.';
+                    } else if (text.length == 1) {
+                        text = '..';
+                    } else if (text.length == 2) {
+                        text = '...';
+                    } else if (text.length == 3) {
+                        text = '';
+
+                        let response = await fetch('/second-step/ready/' + this.query_id, {method: 'get'});
+                        let json = await response.json();
+                        if (json['status'] == 'OK') {
+                            this.form3.skills = json['top_skills'];
+                            this.form3.all_skills = json['skills'];
+                            for (let skill of this.form3.skills) {
+                                this.form3.levels[skill] = 0;
+                                this.form3.all_skills.remove(skill);
+                            }
+                            clearInterval(this.form2.timerId);
+                            this.$refs.form2.classList.remove('d-flex')
+                            this.$refs.form2.classList.add('d-none');
+                            this.$refs.form3.classList.remove('d-none')
+                            this.$refs.form3.classList.add('d-flex');
+                        } 
+                    }
+                    element.innerText = text;
+                },
+                changeLevel: function(event) {
+                    let element = event.target;
+                    let field = element.closest('.skill-field');
+                    let select = element.closest('.skill-level');
+                    let label = select.querySelector('input')
+                    let level = label.value;
+                    let p = field.querySelector('p');
+                    let skill = p.innerText;
+                    app.form3.levels[skill] = +level;
+                    console.log(app.form3.levels);
+                },
+                secondStep: async function(event) {
+                    this.$refs.form3.classList.remove('d-flex')
+                    this.$refs.form3.classList.add('d-none');
+                    this.$refs.form4.classList.remove('d-none')
+                    this.$refs.form4.classList.add('d-flex');
+                    this.form4.timerId = setInterval(this.changeDots2, 1000)
+                    let data = {
+                        name: this.form1.name,
+                        specialization: this.form1.profession,
+                        skills: this.form3.levels,
+                    }
+                    let response = await fetch('/third-step/' + this.query_id, {method: 'put', body: JSON.stringify(data)});
+                    let json = await response.json();
+                    console.log(json);
+                },
+                changeDots2: async function() {
+                    let element = document.getElementById('dots-2');
+                    let text = element.innerText;
+                    if (text.length == 0) {
+                        text = '.';
+                    } else if (text.length == 1) {
+                        text = '..';
+                    } else if (text.length == 2) {
+                        text = '...';
+                    } else if (text.length == 3) {
+                        text = '';
+                    }
+                    element.innerText = text;
+                },
+                addSkill: function(event) {
+                    let skill = event.target.value;
+                    console.log(skill);
+                    this.form3.skills.push(skill);
+                }
+            }
+        })
+    </script>
+
 </body>
 </html>
+
+{% endraw %}
